@@ -15,3 +15,20 @@ script:
     - ./configure
     - make
     - popd
+
+before_deploy:
+    - ./travis_before_deploy || export TRAVIS_TAG=prerelease
+
+deploy:
+    provider: releases
+    token: "$GITHUB_TOKEN"
+    skip_cleanup: true
+    release_notes: "Automatic release created by travis-ci integration"
+    prerelease: true
+    overwrite: true
+    file_glob: true
+    file:
+        - packages/debian/*.deb
+    on:
+        all_branches: true
+        condition: $TRAVIS_BRANCH != prerelease
