@@ -11,5 +11,7 @@ install:
 
 script:
     - make
-    - cd packages/debian && ./configure
-    - cd packages/debian && make
+    - pushd packages/debian
+    - ./configure
+    - make
+    - popd
