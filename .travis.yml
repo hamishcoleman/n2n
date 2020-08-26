@@ -5,7 +5,7 @@ language: c
 
 install:
     - sudo apt-get update
-    - sudo apt-get -y install build-essential autoconf libzstd1-dev libssl-dev dpkg-dev fakeroot
+    - sudo apt-get -y install build-essential autoconf libzstd1-dev libssl-dev dpkg-dev debhelper fakeroot
     - ./autogen.sh
     - ./configure
 
