@@ -1267,6 +1267,41 @@ static void readFromMgmtSocket(n2n_edge_t * eee, int * keep_running) {
 
   /* sendlen = */ sendto(eee->udp_mgmt_sock, udp_buf, msg_len, 0/*flags*/,
 			 (struct sockaddr *)&sender_sock, sizeof(struct sockaddr_in));
+
+ uint32_t num = 0;
+ struct peer_info * peer, *tmpPeer;
+ macstr_t mac_buf;
+ n2n_sock_str_t sockbuf;
+
+ msg_len=0;
+ msg_len += snprintf((char *)(udp_buf+msg_len), (N2N_PKT_BUF_SIZE-msg_len),
+                    "pend:\n");
+
+ HASH_ITER(hh, eee->pending_peers, peer, tmpPeer) {
+   msg_len += snprintf((char *)(udp_buf+msg_len), (N2N_SN_PKTBUF_SIZE-msg_len),
+                           " %02u: %s %21s (last seen: %lu sec ago)\n",
+                           ++num, macaddr_str(mac_buf, peer->mac_addr),
+                           sock_to_cstr(sockbuf, &(peer->sock)), now-peer->last_seen);
+
+   /* sendlen = */ sendto(eee->udp_mgmt_sock, udp_buf, msg_len, 0/*flags*/,
+                       (struct sockaddr *)&sender_sock, sizeof(struct sockaddr_in));
+   msg_len = 0;
+ }
+
+ msg_len += snprintf((char *)(udp_buf+msg_len), (N2N_PKT_BUF_SIZE-msg_len),
+                    "full:\n");
+
+ HASH_ITER(hh, eee->known_peers, peer, tmpPeer) {
+   msg_len += snprintf((char *)(udp_buf+msg_len), (N2N_SN_PKTBUF_SIZE-msg_len),
+                           " %02u: %s %21s (last seen: %lu sec ago)\n",
+                           ++num, macaddr_str(mac_buf, peer->mac_addr),
+                           sock_to_cstr(sockbuf, &(peer->sock)), now-peer->last_seen);
+
+   /* sendlen = */ sendto(eee->udp_mgmt_sock, udp_buf, msg_len, 0/*flags*/,
+                       (struct sockaddr *)&sender_sock, sizeof(struct sockaddr_in));
+   msg_len = 0;
+ }
+
 }
 
 /* ************************************** */
